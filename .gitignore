@@ -1,6 +1,8 @@
 __pycache__/
 *.pyc
 token.txt
+gh_token.txt
+render_token.txt
 cloudflared.exe
 .env
 *.log
