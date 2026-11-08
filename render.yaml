@@ -1,0 +1,18 @@
+services:
+  - name: vallia
+    type: web
+    runtime: python
+    plan: free
+    region: oregon
+    buildCommand: ""
+    startCommand: python -B server.py
+    healthCheckPath: /health
+    envVars:
+      # URL pública do túnel que aponta para o server.py do seu PC (porta 8093).
+      # Ex.: https://algo-aleatorio.trycloudflare.com
+      # É o proxy, não o llama-server: só assim o token é cobrado na entrada.
+      - key: VALLIA_ENGINE
+        sync: false
+      # Mesma string gerada em token.txt no seu computador.
+      - key: VALLIA_TOKEN
+        sync: false

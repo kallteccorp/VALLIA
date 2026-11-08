@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#05070e">
+<meta name="description" content="VALLIA — assistente de texto que roda inteira no seu computador.">
+<title>VALLIA · inteligência local</title>
+<link rel="icon" href="/vallia.svg">
+<link rel="stylesheet" href="/style.css">
+<script src="/app.js" defer></script>
+</head>
+<body>
+<div class="veil" aria-hidden="true">
+  <span class="glow g1"></span><span class="glow g2"></span><span class="mesh"></span>
+  <svg class="noise" width="100%" height="100%"><filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.82" numOctaves="3" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter><rect width="100%" height="100%" filter="url(#grain)"/></svg>
+</div>
+
+<div class="shell">
+  <aside class="rail" id="rail" aria-label="Conversas e estado do motor">
+    <div class="rail-top">
+      <img src="/vallia.svg" alt="" width="34" height="34">
+      <div class="wordmark"><strong>VALLIA</strong><small>motor local</small></div>
+    </div>
+    <button class="btn-new" id="new" type="button">
+      <span class="plus" aria-hidden="true">+</span> Nova conversa
+    </button>
+    <h2 class="rail-title">Arquivo deste navegador</h2>
+    <nav class="chats" id="chats" aria-label="Conversas salvas"></nav>
+
+    <ul class="creed" aria-label="Como a VALLIA funciona">
+      <li>roda no seu processador</li>
+      <li>nenhuma palavra sai daqui</li>
+      <li>sem conta, sem assinatura</li>
+    </ul>
+
+    <div class="panel" aria-label="Telemetria do motor">
+      <h2 class="rail-title">Telemetria</h2>
+      <dl>
+        <div><dt>modelo</dt><dd id="t-model">—</dd></div>
+        <div><dt>velocidade</dt><dd id="t-rate">—<span> tok/s</span></dd></div>
+        <div><dt>gerados</dt><dd id="t-tokens">0</dd></div>
+      </dl>
+      <div class="meter"><i id="meter-fill"></i></div>
+      <p class="meter-label"><span id="t-ctx">janela 2048</span> · <span id="t-used">0%</span> usada</p>
+    </div>
+
+    <p class="rail-foot" id="railfoot"><span class="dot" id="led"></span><span id="status" role="status">procurando o motor…</span></p>
+  </aside>
+
+  <main class="stage" id="stage" data-mode="hero">
+    <header class="topbar">
+      <button class="btn-menu" id="menu" type="button" aria-controls="rail" aria-expanded="false">menu</button>
+      <span class="pill-orb" aria-hidden="true"><b></b><b></b><i></i></span>
+      <span class="pill-name">VALLIA</span>
+      <span class="pill-state" id="pill-state">ociosa</span>
+      <span class="spacer"></span>
+      <span class="pill-off"><span class="dot on"></span> sem nuvem</span>
+    </header>
+
+    <section class="scroll" id="scroll" aria-label="Conversa">
+      <div class="beacon"><div>
+        <div class="orb" id="orb" aria-hidden="true">
+          <span class="halo"></span>
+          <span class="ring r1"></span>
+          <span class="ring r2"></span>
+          <span class="ring r3"></span>
+          <span class="core"></span>
+          <span class="beat" id="beat"></span>
+          <span class="spark s1"></span><span class="spark s2"></span><span class="spark s3"></span>
+          <svg class="arc" viewBox="0 0 100 100">
+            <circle class="arc-track" cx="50" cy="50" r="46"/>
+            <circle class="arc-live" id="arc" cx="50" cy="50" r="46"/>
+          </svg>
+          <span class="bars" id="bars"><i></i><i></i><i></i><i></i><i></i></span>
+        </div>
+      </div></div>
+
+      <div class="hero-wrap">
+      <div class="hero" id="hero">
+        <h1 class="title" aria-label="VALLIA">
+          <span class="letters"><b>V</b><b>A</b><b>L</b><b>L</b><b>I</b><b>A</b></span>
+        </h1>
+        <p class="tagline"><span class="rule"></span>conversas que acontecem dentro da sua máquina</p>
+        <p class="lede">A VALLIA só lê e escreve texto. Nada sai do seu PC — o modelo pesa 5,6&nbsp;GB e roda aqui, devagar de propósito.</p>
+
+        <div class="chips" aria-label="Comece por aqui">
+          <button type="button" class="chip" data-prompt="Explique em três frases simples o que é um token em um modelo de linguagem.">
+            <small>01 · entender</small><strong>O que é um token <span aria-hidden="true">↗</span></strong>
+          </button>
+          <button type="button" class="chip" data-prompt="Monte um roteiro de três blocos para eu estudar Python por uma hora por dia.">
+            <small>02 · planejar</small><strong>Um plano de estudo <span aria-hidden="true">↗</span></strong>
+          </button>
+          <button type="button" class="chip" data-prompt="Reescreva este aviso de forma mais cordial: 'O sistema está fora do ar, tentaremos voltar depois.'">
+            <small>03 · reescrever</small><strong>Um aviso mais gentil <span aria-hidden="true">↗</span></strong>
+          </button>
+        </div>
+        <p class="hero-foot">tempo médio de resposta: <b id="hero-eta">≈ 45&nbsp;s</b> · janela curta de contexto</p>
+      </div>
+      </div>
+
+      <ol class="log" id="log" role="log" aria-label="Mensagens"></ol>
+      <button class="btn-bottom" id="bottom" type="button" hidden>ir para o fim ↓</button>
+    </section>
+
+    <div class="dock">
+      <p class="error" id="error" role="alert" hidden></p>
+      <form class="composer" id="composer">
+        <div class="field">
+          <label class="sr" for="prompt">Sua mensagem para a VALLIA</label>
+          <textarea id="prompt" rows="1" maxlength="3000" placeholder="Escreva para a VALLIA…" required></textarea>
+          <div class="tools">
+            <div class="segment" role="group" aria-label="Comprimento da resposta">
+              <span class="segment-label">resposta</span>
+              <button type="button" data-tokens="96" aria-pressed="false">curta</button>
+              <button type="button" data-tokens="260" aria-pressed="true">média</button>
+              <button type="button" data-tokens="512" aria-pressed="false">longa</button>
+            </div>
+            <span class="count"><b id="count">0</b> / 3000</span>
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn-send" id="send" type="submit" disabled><span class="ar">↑</span><span class="lbl">enviar</span></button>
+          <button class="btn-stop" id="stop" type="button" hidden>parar</button>
+        </div>
+      </form>
+      <p class="dock-foot"><span id="activity" aria-live="polite">Enter envia · Shift + Enter quebra linha</span><span id="elapsed"></span></p>
+    </div>
+  </main>
+</div>
+</body>
+</html>

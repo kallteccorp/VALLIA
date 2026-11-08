@@ -1,0 +1,2 @@
+# A VALLIA usa apenas a biblioteca padrão do Python 3.10+.
+# Este arquivo existe para o Render reconhecer o projeto como serviço Python.

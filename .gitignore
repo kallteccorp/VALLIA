@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+token.txt
+cloudflared.exe
+.env
+*.log
+start.lock
