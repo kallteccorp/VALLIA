@@ -3,6 +3,7 @@ __pycache__/
 token.txt
 gh_token.txt
 render_token.txt
+.git-credentials
 cloudflared.exe
 .env
 *.log
