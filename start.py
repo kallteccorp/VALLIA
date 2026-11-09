@@ -30,10 +30,22 @@ def running():
         return False
 
 
+def engine_up():
+    try:
+        with urlopen("http://127.0.0.1:8091/health", timeout=1):
+            return True
+    except OSError:
+        return False
+
+
 def main():
     if not ENGINE.is_file():
         raise RuntimeError(f"O inicializador do modelo não existe mais em {ENGINE}.")
-    subprocess.run([sys.executable, "-B", str(ENGINE), "--no-browser"], check=True)
+    # O launch.py reclama se já há outra janela iniciando o modelo; nesse caso o
+    # que importa é o motor estar de pé, não o código de saída dele.
+    done = subprocess.run([sys.executable, "-B", str(ENGINE), "--no-browser"])
+    if done.returncode and not engine_up():
+        raise RuntimeError("O modelo não iniciou. Rode o launch.py do deepseek-local para ver o erro.")
     if running():
         return
     with LOG.open("ab") as log:

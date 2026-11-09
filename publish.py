@@ -77,20 +77,16 @@ def api(token, method, path, body=None, query=""):
 
 
 def push():
-    """O token vai para um arquivo de credenciais temporário que some no finally."""
+    """Helper inline: o Gerenciador do Windows guarda outra conta e ignoraria o arquivo."""
     token = read(GH_FILE, "Personal Access Token do GitHub")
-    store = ROOT / ".git-credentials"
-    store.write_text(f"https://x-access-token:{token}@github.com\n", encoding="utf-8")
-    env = {**os.environ, "GCM_INTERACTIVE": "never", "GIT_TERMINAL_PROMPT": "0"}
-    helper = f"credential.helper=store --file={store.as_posix()}"
-    try:
-        done = subprocess.run(
-            ["git", "-c", "credential.helper=", "-c", helper, "push", "-u", "origin", BRANCH],
-            env=env, text=True, encoding="utf-8", errors="replace",
-            stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-        )
-    finally:
-        store.unlink(missing_ok=True)
+    helper = 'credential.helper=!f() { echo username=x-access-token; echo "password=$VALLIA_GH_TOKEN"; }; f'
+    env = {**os.environ, "VALLIA_GH_TOKEN": token, "GCM_INTERACTIVE": "never",
+           "GIT_TERMINAL_PROMPT": "0"}
+    done = subprocess.run(
+        ["git", "-c", "credential.helper=", "-c", helper, "push", "-u", "origin", BRANCH],
+        env=env, text=True, encoding="utf-8", errors="replace",
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+    )
     print(scrub((done.stdout or "").strip()), flush=True)
     if done.returncode:
         sys.exit("O push falhou; nada foi publicado no Render.")
